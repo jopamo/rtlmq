@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config RTLMQ
+	tristate "Realtek RTL8125B and RTL8126A Ethernet support"
+	depends on PCI
+	depends on PTP_1588_CLOCK_OPTIONAL
+	select PHYLIB
+	select REALTEK_PHY
+	select PAGE_POOL
+	help
+	  Say Y or M here for Realtek RTL8125B (PCI 10ec:8125, masked XID
+	  0x641, methods 4/5) or RTL8126A (PCI 10ec:8126 or 10ec:5000,
+	  masked XIDs 0x649/0x64a, methods 2/3 respectively). Unknown
+	  methods and detected fiber boards are rejected. The RTL8125B default is
+	  four RX queues and one TX queue; RTL8126A defaults to four RX and
+	  one TX queue. Both use descriptor-close TX.
+
+	  Selecting two TX queues enables RTLMQ's driver-managed queue
+	  serialization for mqprio.
+
+	  To compile this driver as a module, choose M here. The module
+	  will be called rtlmq.
+
+config RTLMQ_LEDS
+	bool "RTL8125B hardware LED control"
+	depends on RTLMQ
+	depends on LEDS_CLASS
+	depends on LEDS_TRIGGER_NETDEV
+	depends on !(RTLMQ=y && LEDS_CLASS=m)
+	default y
+	help
+	  Enable standard netdev-trigger hardware control for the four
+	  RTL8125B LED registers. Link-speed and combined RX/TX activity modes
+	  are supported; unsupported trigger combinations fail closed. Firmware
+	  defaults remain untouched until userspace selects hardware control.
